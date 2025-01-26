@@ -1,4 +1,3 @@
-
 module.exports = {
     env: {
       browser: false,
@@ -36,5 +35,3 @@ module.exports = {
       }
     ]
 };
-
-
