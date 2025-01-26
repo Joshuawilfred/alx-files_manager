@@ -1,22 +1,39 @@
-const express = require('express');
-const AppController = require('../controllers/AppController');
-const UsersController = require('../controllers/UsersController');
-const AuthController = require('../controllers/AuthController');
-const FilesController = require('../controllers/FilesController');
+/* eslint-disable no-unused-vars */
+import { Express } from 'express';
+import AppController from '../controllers/AppController';
+import UsersController from '../controllers/UsersController';
+import AuthController from '../controllers/AuthController';
+import FilesController from '../controllers/FilesController';
+import { authenticateUser } from '../middlewares/auth';
+import { handleError } from '../helper/errorHandler';
 
-const router = express.Router();
+/**
+ * @param {Express} api
+ */
 
-router.get('/status', AppController.getStatus);
-router.get('/stats', AppController.getStats);
-router.post('/users', UsersController.postNew);
-router.get('/connect', AuthController.getConnect);
-router.get('/disconnect', AuthController.getDisconnect);
-router.get('/users/me', UsersController.getMe);
-router.post('/files', FilesController.postUpload);
-router.get('/files/:id', FilesController.getShow);
-router.get('/files', FilesController.getIndex);
-router.put('/files/:id/publish', FilesController.putPublish);
-router.put('/files/:id/unpublish', FilesController.putUnpublish);
-router.get('/files/:id/data', FilesController.getFile);
+const router = (api) => {
+  // Status and Stats
+  api.get('/status', AppController.getStatus);
+  api.get('/stats', AppController.getStats);
 
-module.exports = router;
+  // Users
+  api.post('/users', UsersController.postNew);
+  api.get('/users/me', UsersController.getMe);
+
+  // Authentication
+  api.get('/connect', AuthController.getConnect);
+  api.get('/disconnect', AuthController.getDisconnect);
+
+  // Files
+  api.post('/files', authenticateUser, FilesController.postUpload);
+  api.get('/files/:id', authenticateUser, FilesController.getShow);
+  api.get('/files', authenticateUser, FilesController.getIndex);
+  api.get('/files/:id/data', FilesController.getFile);
+
+  api.put('/files/:id/publish', authenticateUser, FilesController.putPublish);
+  api.put('/files/:id/unpublish', authenticateUser, FilesController.putUnpublish);
+
+  api.use(handleError);
+};
+
+export default router;
