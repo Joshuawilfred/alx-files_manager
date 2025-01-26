@@ -1,14 +1,12 @@
-const express = require('express');
-const router = require('./routes/index');
+import express from 'express';
+import startapp from './dir/startapp';
+import Middlewares from './dir/middlewares';
+import router from './routes';
 
-const app = express();
-const port = 5000;
+const server = express();
 
-app.use(express.json());
-app.use(router);
+Middlewares(server);
+router(server);
+startapp(server);
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-});
-
-export default app;
+export default server;
